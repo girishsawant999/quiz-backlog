@@ -1,16 +1,12 @@
-import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
+import AppRouter from "./routes/AppRouter";
 
 function App() {
   return (
     <>
-      <Button
-        onClick={() => {
-          console.log("clicked");
-        }}
-      >
-        Click me
-      </Button>
+      <Toaster />
+      <AppRouter />
     </>
   );
 }
