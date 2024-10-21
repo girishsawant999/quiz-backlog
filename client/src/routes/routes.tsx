@@ -1,5 +1,6 @@
 import SignIn from "@/Pages/Auth/SignIn";
 import DashBoard from "@/Pages/DashBoard";
+import UsersManagement from "@/Pages/UsersManagement";
 
 export const PUBLIC_ROUTES = [
   {
@@ -12,6 +13,10 @@ export const PRIVATE_ROUTES = [
   {
     path: "/",
     element: <DashBoard />,
+  },
+  {
+    path: "/users",
+    element: <UsersManagement />,
   },
   {
     path: "*",
