@@ -7,46 +7,97 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { useAuth } from "../context";
+
+const signInFormSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+});
 
 const SignIn = () => {
   const { login } = useAuth();
+  const form = useForm<z.infer<typeof signInFormSchema>>({
+    resolver: zodResolver(signInFormSchema),
+
+    defaultValues: {
+      email: "admin@admin.com",
+      password: "admin_2024",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof signInFormSchema>) => {
+    await login(values.email, values.password);
+  };
 
   return (
     <section className="min-h-screen grid place-items-center">
       <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>Sign in to your account to continue</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Username</Label>
-                <Input
-                  id="name"
-                  placeholder="Enter User name"
-                  defaultValue="admin"
+        <Form {...form}>
+          <CardHeader>
+            <CardTitle>Sign In</CardTitle>
+            <CardDescription>
+              Sign in to your account to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="grid w-full items-center gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter email address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Password</Label>
-                <Input
-                  id="name"
-                  placeholder="Enter password"
-                  type="password"
-                  defaultValue={"1234"}
-                />
-              </div>
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button onClick={login}>Sign In</Button>
-        </CardFooter>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
+              Sign In
+            </Button>
+          </CardFooter>
+        </Form>
       </Card>
     </section>
   );

@@ -2,18 +2,11 @@ import useLocalStorage from "@/hooks/use-localstorage";
 import { useToast } from "@/hooks/use-toast";
 import React, { createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
-type TAuthUser = {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  token: string;
-} | null;
+import { onSignIn } from "../api";
 
 type TAuthContext = {
-  user: TAuthUser;
-  login: () => void;
+  user: TAuthUser | null;
+  login: (email: string, password: string) => void;
   logout: () => void;
   isLoggedIn: boolean;
 };
@@ -27,22 +20,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const login = () => {
-    setUser({
-      id: 1,
-      username: "admin",
-      email: "test@gmail.com",
-      role: "admin",
-      token: "123456",
-    });
-    toast({
-      title: "Successfully Logged In",
-    });
-    navigate("/");
+  const login = async (email: string, password: string) => {
+    try {
+      const { data } = await onSignIn(email, password);
+      setUser(data.data.user);
+      localStorage.setItem("token", data.data.token);
+      toast({
+        title: "Successfully Logged In",
+      });
+      navigate("/");
+    } catch (error: unknown) {
+      toast({
+        title: "Failed to Log In",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    }
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("token");
   };
 
   return (
