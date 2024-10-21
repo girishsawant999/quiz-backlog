@@ -7,7 +7,9 @@ const PrivateLayout: React.FC<{ children: React.ReactNode }> = ({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="relative block p-4">{children}</main>
+      <main className="relative w-full h-svh  overflow-y-auto py-6 px-8">
+        {children}
+      </main>
     </SidebarProvider>
   );
 };

@@ -1,12 +1,4 @@
-import {
-  Calendar,
-  ChevronUp,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  User2,
-} from "lucide-react";
+import { ChevronUp, Home, User2, Users } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -33,28 +25,13 @@ import { Link } from "react-router-dom";
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Users",
+    url: "/users",
+    icon: Users,
   },
 ];
 
