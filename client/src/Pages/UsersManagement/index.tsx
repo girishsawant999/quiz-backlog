@@ -1,19 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
-import { getUsers } from "./api";
 import CreateUser from "./components/CreateUserModal";
+import UsersTable from "./components/UsersTable";
 
 const UsersManagement = () => {
-  const { data } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
-  console.log("data", data);
-
   return (
     <section>
-      <header className="flex w-full justify-between items-center">
+      <header className="flex w-full justify-between items-center mb-5">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Users
             size={20}
@@ -29,6 +22,10 @@ const UsersManagement = () => {
           </CreateUser>
         </div>
       </header>
+
+      <main>
+        <UsersTable />
+      </main>
     </section>
   );
 };

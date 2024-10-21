@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -66,6 +66,7 @@ const createUserFormSchema = z.object({
 const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof createUserFormSchema>>({
     resolver: zodResolver(createUserFormSchema),
@@ -92,6 +93,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
     mutationKey: ["createUser"],
     mutationFn: createUser,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       onClose();
       toast({
         title: "User created successfully.",

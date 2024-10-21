@@ -1,7 +1,8 @@
-import apiInstance from "@/helpers/api";
+import { apiInstance } from "@/helpers/api";
 
 export const getUsers = async () => {
-  return apiInstance.get("user/getUsers");
+  return (await apiInstance.get<{ users: TUser[] }>("user/getUsers")).data
+    .users;
 };
 
 export const getUser = async (id: string) => {
