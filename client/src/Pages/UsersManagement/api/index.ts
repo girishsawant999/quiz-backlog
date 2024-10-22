@@ -20,10 +20,17 @@ export const createUser = async (data: {
   return apiInstance.post("user/createUser", data);
 };
 
-export const updateUser = async (data: unknown) => {
+export const updateUser = async (data: {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  mobile: string;
+  role: string;
+}) => {
   return apiInstance.post("user/updateUser", data);
 };
 
-export const deleteUser = async (id: string) => {
-  return apiInstance.post("user/deleteUser", { id });
+export const deleteUser = async (_id: string) => {
+  return apiInstance.post("user/deleteUser", { _id });
 };
