@@ -130,7 +130,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>First Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter first name" {...field} />
                     </FormControl>
@@ -202,7 +202,12 @@ const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
                   <FormItem>
                     <FormLabel>Role</FormLabel>
                     <FormControl>
-                      <Select {...field}>
+                      <Select
+                        onValueChange={(value) =>
+                          form.setValue(field.name, value)
+                        }
+                        {...field}
+                      >
                         <SelectTrigger>
                           <SelectValue
                             placeholder="Select role"
