@@ -1,25 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
-import CreateUser from "./components/CreateUserModal";
 import UsersTable from "./components/UsersTable";
 
 const UsersManagement = () => {
   return (
     <section>
-      <header className="flex w-full justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Users
-            size={20}
-            fontWeight={700}
-            className="inline-block text-gray-500"
-          />
-          Users
-        </h2>
-
+      <header className="flex w-full justify-between items-center pb-4 border-b border-gray-200">
         <div>
-          <CreateUser>
-            {({ onOpen }) => <Button onClick={onOpen}>Create new user</Button>}
-          </CreateUser>
+          <h2 className="text-2xl font-semibold">Users</h2>
+          <p className="text-muted-foreground">
+            Here's a list of users in the system.
+          </p>
         </div>
       </header>
 
