@@ -105,9 +105,6 @@ const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
     userMutation.mutate(values);
   };
 
-  const disableSaveButton =
-    form.formState.isSubmitting || !form.formState.isValid;
-
   return (
     <>
       {children({ onOpen, onClose })}
@@ -235,8 +232,8 @@ const CreateUser: React.FC<CreateUserProps> = ({ children }) => {
               <Button
                 type="submit"
                 onClick={form.handleSubmit(onSubmit)}
-                disabled={disableSaveButton}
                 className="flex items-center gap-2"
+                disabled={form.formState.isSubmitting || userMutation.isPending}
               >
                 {(form.formState.isSubmitting || userMutation.isPending) && (
                   <Loader className="animate-spin" />
