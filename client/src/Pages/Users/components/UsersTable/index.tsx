@@ -20,12 +20,17 @@ import {
 } from "@tanstack/react-table";
 import { Pen, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { deleteUser, getUsers } from "../../api";
 import CreateUser from "../CreateUserModal";
 import UpdateUserModal from "../UpdateUserModal";
 import DataTable from "./DataTable";
 
-const UsersTable = () => {
+const UsersTable = ({
+  actionContainerRef,
+}: {
+  actionContainerRef: React.RefObject<HTMLDivElement>;
+}) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -124,22 +129,26 @@ const UsersTable = () => {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Search..."
-          value={globalFilter}
-          onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
-        <CreateUser>
-          {({ onOpen }) => (
-            <Button className="ml-auto" onClick={onOpen}>
-              <Plus size={16} />
-              Create new user
-            </Button>
-          )}
-        </CreateUser>
-      </div>
+      {actionContainerRef.current &&
+        createPortal(
+          <div className="flex items-center gap-3">
+            <Input
+              placeholder="Search..."
+              value={globalFilter}
+              onChange={(event) => setGlobalFilter(event.target.value)}
+              className="max-w-sm"
+            />
+            <CreateUser>
+              {({ onOpen }) => (
+                <Button className="ml-auto" onClick={onOpen}>
+                  <Plus size={16} />
+                  Create new user
+                </Button>
+              )}
+            </CreateUser>
+          </div>,
+          actionContainerRef.current
+        )}
 
       <DataTable<TUser> table={{ ...table, loading: isFetching }} />
       <UpdateUserModal
