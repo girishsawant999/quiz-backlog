@@ -1,6 +1,6 @@
 import UsersTable from "./components/UsersTable";
 
-const UsersManagement = () => {
+const Users = () => {
   return (
     <section>
       <header className="flex w-full justify-between items-center pb-4 border-b border-gray-200">
@@ -19,4 +19,4 @@ const UsersManagement = () => {
   );
 };
 
-export default UsersManagement;
+export default Users;
