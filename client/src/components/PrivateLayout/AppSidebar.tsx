@@ -19,6 +19,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/Pages/Auth/context";
+import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 
 // Menu items.
@@ -32,6 +33,11 @@ const items = [
     title: "Users",
     url: "/users",
     icon: Users,
+  },
+  {
+    title: "Questions",
+    url: "/questions",
+    icon: QuestionMarkCircledIcon,
   },
 ];
 
