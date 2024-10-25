@@ -86,3 +86,7 @@
 * {
   font-family: "Inter", sans-serif;
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}

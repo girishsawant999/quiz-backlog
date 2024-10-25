@@ -21,10 +21,10 @@ import {
 import { Pen, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import DataTable from "../../../../components/DataTable";
 import { deleteUser, getUsers } from "../../api";
 import CreateUser from "../CreateUserModal";
 import UpdateUserModal from "../UpdateUserModal";
-import DataTable from "./DataTable";
 
 const UsersTable = ({
   actionContainerRef,
@@ -45,8 +45,7 @@ const UsersTable = ({
   const deleteUserMutation = useMutation({
     mutationKey: ["delete-user"],
     mutationFn: deleteUser,
-    onSuccess: (data) => {
-      console.log("data", data);
+    onSuccess: () => {
       toast({
         title: "User has been deleted successfully",
       });
