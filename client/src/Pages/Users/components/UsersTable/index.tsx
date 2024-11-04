@@ -1,27 +1,16 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ColumnDef,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Pen, Plus, Trash2 } from "lucide-react";
+  Button,
+  Dropdown,
+  Input,
+  message,
+  Table,
+  TableColumnsType,
+} from "antd";
+import { Ellipsis, PencilLine, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import DataTable from "../../../../components/DataTable";
 import { deleteUser, getUsers } from "../../api";
 import CreateUser from "../CreateUserModal";
 import UpdateUserModal from "../UpdateUserModal";
@@ -31,10 +20,9 @@ const UsersTable = ({
 }: {
   actionContainerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<TUser | null>(null);
 
   const { data, isFetching } = useQuery({
     queryKey: ["users"],
@@ -46,85 +34,68 @@ const UsersTable = ({
     mutationKey: ["delete-user"],
     mutationFn: deleteUser,
     onSuccess: () => {
-      toast({
-        title: "User has been deleted successfully",
-      });
+      message.success("User has been deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 
-  const columns: ColumnDef<TUser>[] = useMemo(
-    () => [
-      {
-        accessorKey: "firstName",
-        header: "First Name",
-      },
-      {
-        accessorKey: "lastName",
-        header: "Last Name",
-      },
-      {
-        accessorKey: "email",
-        header: "Email",
-      },
-      {
-        accessorKey: "mobile",
-        header: "Mobile",
-      },
-      {
-        accessorKey: "role",
-        header: "Role",
-      },
-      {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <DotsHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="border-b border-gray-200">
-                  Actions
-                </DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setCurrentUser(row.original)}>
-                  <Pen />
-                  Edit user
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-rose-600 hover:!bg-red-100 hover:!text-rose-600"
-                  onClick={() => deleteUserMutation.mutate(row.original._id)}
-                >
-                  <Trash2 />
-                  Delete user
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
+  const columns: TableColumnsType<TUser> = useMemo(
+    () =>
+      [
+        {
+          dataIndex: "firstName",
+          title: "First Name",
         },
-      },
-    ],
+        {
+          dataIndex: "lastName",
+          title: "Last Name",
+        },
+        {
+          dataIndex: "email",
+          title: "Email",
+        },
+        {
+          dataIndex: "mobile",
+          title: "Mobile",
+        },
+        {
+          dataIndex: "role",
+          title: "Role",
+        },
+        {
+          title: "Actions",
+          render: (_, record) => (
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    key: "edit",
+                    icon: <PencilLine size={14} />,
+                    label: "Edit user",
+                    onClick: () => {
+                      setCurrentUser(record);
+                    },
+                  },
+                  {
+                    key: "delete",
+                    icon: <Trash2 size={14} />,
+                    label: "Delete user",
+                    onClick: () => {
+                      deleteUserMutation.mutate(record._id);
+                    },
+                  },
+                ],
+              }}
+            >
+              <Button icon={<Ellipsis />} />
+            </Dropdown>
+          ),
+        },
+      ] as TableColumnsType<TUser>,
     [deleteUserMutation]
   );
 
   const [globalFilter, setGlobalFilter] = useState("");
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    state: {
-      globalFilter,
-    },
-  });
 
   return (
     <div className="w-full">
@@ -139,8 +110,8 @@ const UsersTable = ({
             />
             <CreateUser>
               {({ onOpen }) => (
-                <Button className="ml-auto" onClick={onOpen}>
-                  <Plus size={16} />
+                <Button type="primary" onClick={onOpen}>
+                  <PlusOutlined />
                   Create new user
                 </Button>
               )}
@@ -149,12 +120,12 @@ const UsersTable = ({
           actionContainerRef.current
         )}
 
-      <DataTable<TUser> table={{ ...table, loading: isFetching }} />
+      <Table columns={columns} dataSource={data} loading={isFetching} />
       <UpdateUserModal
         open={!!currentUser}
         onOpenChange={(open) => setCurrentUser(open ? currentUser : null)}
         onClose={() => setCurrentUser(null)}
-        user={currentUser as TUser}
+        user={currentUser}
       />
     </div>
   );

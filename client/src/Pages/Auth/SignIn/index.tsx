@@ -1,23 +1,6 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Button, Card, Form, Input } from "antd";
+import { createSchemaFieldRule } from "antd-zod";
+import { useForm } from "antd/es/form/Form";
 import { z } from "zod";
 import { useAuth } from "../context";
 
@@ -30,16 +13,11 @@ const signInFormSchema = z.object({
   }),
 });
 
+const rule = createSchemaFieldRule(signInFormSchema);
+
 const SignIn = () => {
   const { login } = useAuth();
-  const form = useForm<z.infer<typeof signInFormSchema>>({
-    resolver: zodResolver(signInFormSchema),
-
-    defaultValues: {
-      email: "admin@admin.com",
-      password: "admin_2024",
-    },
-  });
+  const [form] = useForm<z.infer<typeof signInFormSchema>>();
 
   const onSubmit = async (values: z.infer<typeof signInFormSchema>) => {
     await login(values.email, values.password);
@@ -47,56 +25,40 @@ const SignIn = () => {
 
   return (
     <section className="min-h-screen grid place-items-center">
-      <Card className="w-[350px]">
-        <Form {...form}>
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
+      <Card className="w-[350px] shadow">
+        <Form
+          layout="vertical"
+          form={form}
+          onFinish={onSubmit}
+          initialValues={{ email: "admin@admin.com", password: "admin_2024" }}
+        >
+          <Form.Item>
+            <h2 className="text-gray-800 font-semibold text-base">Sign In</h2>
+            <p className="text-gray-600 text-sm">
               Sign in to your account to continue
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="grid w-full items-center gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter email address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            </p>
+          </Form.Item>
+          <Form.Item>
+            <div className="grid w-full items-center gap-2">
+              <Form.Item name="email" label="Email" rules={[rule]}>
+                <Input placeholder="Enter email address" />
+              </Form.Item>
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </form>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
+              <Form.Item name="password" label="Password" rules={[rule]}>
+                <Input.Password placeholder="Enter password" />
+              </Form.Item>
+            </div>
+          </Form.Item>
+          <Form.Item>
+            <Button
+              block
+              type="primary"
+              htmlType="submit"
+              onClick={form.submit}
+            >
               Sign In
             </Button>
-          </CardFooter>
+          </Form.Item>
         </Form>
       </Card>
     </section>

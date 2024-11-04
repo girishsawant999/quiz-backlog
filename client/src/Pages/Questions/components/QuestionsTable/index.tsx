@@ -1,28 +1,18 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import CreateUser from "@/Pages/Users/components/CreateUserModal";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+// Import necessary components and hooks
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ColumnDef,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { Pen, Plus, Trash2 } from "lucide-react";
+  Button,
+  Dropdown,
+  Input,
+  message,
+  Table,
+  TableColumnsType,
+} from "antd";
+import { Ellipsis, PencilLine, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import DataTable from "../../../../components/DataTable";
 import { deleteQuestion, getQuestions } from "../../api";
+import CreateQuestionModal from "../CreateQuestionModal";
 
 const QuestionsTable = ({
   actionContainerRef,
@@ -30,10 +20,8 @@ const QuestionsTable = ({
   actionContainerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const [selectedQuestion, setSelectedQuestion] = useState<TQuestion | null>(
-    null
-  );
+
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
 
   const { data: questions, isFetching } = useQuery({
     queryKey: ["questions"],
@@ -41,107 +29,67 @@ const QuestionsTable = ({
     initialData: [],
   });
 
-  const deleteUserMutation = useMutation({
+  const deleteQuestionMutation = useMutation({
     mutationKey: ["delete-question"],
     mutationFn: deleteQuestion,
     onSuccess: () => {
-      toast({
-        title: "Question has been deleted successfully",
-      });
+      message.success("Question has been deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["questions"] });
     },
   });
 
-  const columns = useMemo<ColumnDef<TQuestion>[]>(
+  const columns: TableColumnsType<TQuestion> = useMemo(
     () => [
       {
-        accessorKey: "title",
-        header: "Title",
+        dataIndex: "title",
+        title: "Title",
       },
       {
-        accessorKey: "description",
-        header: "Description",
+        dataIndex: "description",
+        title: "Description",
       },
       {
-        accessorKey: "category",
-        header: "Category",
+        dataIndex: "category",
+        title: "Category",
       },
       {
-        accessorKey: "difficulty",
-        header: "Difficulty",
+        dataIndex: "difficulty",
+        title: "Difficulty",
       },
       {
-        header: "Options",
-        cell: ({ row }) => (
-          <div className="flex gap-1">
-            {row.original.options.map(
-              (option: TQuestion["options"][number]) => (
-                <span>{option.optionValue},</span>
-              )
-            )}
-          </div>
-        ),
-      },
-      {
-        header: "Options",
-        cell: ({ row }) => {
-          const options = (row.original as TQuestion).options;
-          const correctOpt = options.find(
-            (_: TQuestion["options"][number]) =>
-              _.optionId === (row.original as TQuestion).correctOption
-          );
-          return (
-            <div className="flex gap-1">
-              <span>{correctOpt.optionValue}</span>
-            </div>
-          );
-        },
-      },
-      {
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-8 h-8 p-0">
-                <DotsHorizontalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => setSelectedQuestion(row.original)}
-              >
-                <Pen className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => deleteUserMutation.mutate(row.original._id)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        title: "Actions",
+        render: (_, record) => (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "edit",
+                  icon: <PencilLine size={14} />,
+                  label: "Edit question",
+                  onClick: () => {
+                    setSelectedQuestion(record);
+                  },
+                },
+                {
+                  key: "delete",
+                  icon: <Trash2 size={14} />,
+                  label: "Delete question",
+                  onClick: () => {
+                    deleteQuestionMutation.mutate(record._id);
+                  },
+                },
+              ],
+            }}
+          >
+            <Button icon={<Ellipsis />} />
+          </Dropdown>
         ),
       },
     ],
-    [deleteUserMutation]
+    [deleteQuestionMutation]
   );
 
   const [globalFilter, setGlobalFilter] = useState("");
-
-  const table = useReactTable({
-    data: questions,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    state: {
-      globalFilter,
-    },
-  });
 
   return (
     <div className="w-full">
@@ -154,24 +102,24 @@ const QuestionsTable = ({
               onChange={(event) => setGlobalFilter(event.target.value)}
               className="max-w-sm"
             />
-            <CreateUser>
+            <CreateQuestionModal>
               {({ onOpen }) => (
-                <Button className="ml-auto" onClick={onOpen}>
-                  <Plus size={16} />
+                <Button type="primary" onClick={onOpen}>
+                  <Plus />
                   Create new question
                 </Button>
               )}
-            </CreateUser>
+            </CreateQuestionModal>
           </div>,
           actionContainerRef.current
         )}
 
-      <DataTable<TUser> table={{ ...table, loading: isFetching }} />
-      {/* <UpdateUserModal
-        open={!!currentUser}
-        onOpenChange={(open) => setCurrentUser(open ? currentUser : null)}
-        onClose={() => setCurrentUser(null)}
-        user={currentUser as TUser}
+      <Table columns={columns} dataSource={questions} loading={isFetching} />
+      {/* <UpdateQuestionModal
+        open={!!selectedQuestion}
+        onOpenChange={(open) => setSelectedQuestion(open ? selectedQuestion : null)}
+        onClose={() => setSelectedQuestion(null)}
+        question={selectedQuestion}
       /> */}
     </div>
   );

@@ -1,1 +1,1 @@
-type TUser = z.infer<typeof import("./schema").UserSchema>;
+type TUser = import("zod").infer<typeof import("./schema").UserSchema>;

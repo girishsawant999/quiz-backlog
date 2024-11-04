@@ -1,4 +1,6 @@
 import { apiInstance } from "@/helpers/api";
+import { z } from "zod";
+import { createQuestionFormSchema } from "../components/CreateQuestionModal";
 
 export const getQuestions = async () => {
   return (
@@ -10,12 +12,9 @@ export const getQuestion = async (id: string) => {
   return apiInstance.get(`question/getQuestion?id=${id}`);
 };
 
-export const createQuestion = async (data: {
-  title: string;
-  content: string;
-  tags: string[];
-  authorId: string;
-}) => {
+export const createQuestion = async (
+  data: z.infer<typeof createQuestionFormSchema>
+) => {
   return apiInstance.post("question/createQuestion", data);
 };
 

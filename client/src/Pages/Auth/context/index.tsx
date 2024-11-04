@@ -1,5 +1,5 @@
+import toast from "@/components/Toaster";
 import useLocalStorage from "@/hooks/use-localstorage";
-import { useToast } from "@/hooks/use-toast";
 import React, { createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { onSignIn } from "../api";
@@ -17,7 +17,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useLocalStorage<TAuthUser | null>("user", null);
-  const { toast } = useToast();
+
   const navigate = useNavigate();
 
   const login = async (email: string, password: string) => {
@@ -25,16 +25,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { data } = await onSignIn(email, password);
       setUser(data.data.user);
       localStorage.setItem("token", data.data.token);
-      toast({
-        title: "Successfully Logged In",
-      });
+
+      toast.success("Successfully Logged In");
       navigate("/");
-    } catch (error: unknown) {
-      toast({
-        title: "Failed to Log In",
-        description: (error as Error).message,
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 

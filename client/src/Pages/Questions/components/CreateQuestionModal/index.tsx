@@ -1,89 +1,174 @@
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "@/components/Toaster";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { Button, Checkbox, Drawer, Form, Input, Select } from "antd";
+import { createSchemaFieldRule } from "antd-zod";
+import { useForm } from "antd/es/form/Form";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import { createQuestion } from "../../api";
-import { QuestionSchema } from "../../schema";
 
-const CreateQuestionModal = () => {
+type CreateQuestionProps = {
+  children: (props: {
+    onOpen: () => void;
+    onClose: () => void;
+  }) => React.ReactNode;
+};
+
+const questionDifficulty = {
+  EASY: "Easy",
+  MEDIUM: "Medium",
+  HARD: "Hard",
+};
+
+const questionCategories = {
+  MATH: "Mathematics",
+  SCIENCE: "Science",
+  HISTORY: "History",
+};
+
+export const createQuestionFormSchema = z.object({
+  title: z.string().min(5, {
+    message: "Title must be at least 5 characters.",
+  }),
+  description: z.string().optional(),
+  options: z.array(z.string()),
+  correctOption: z.string(),
+  difficulty: z.enum(["Easy", "Medium", "Hard"]),
+  category: z.enum(["Mathematics", "Science", "History"]),
+  isPractice: z.boolean(),
+});
+
+const rule = createSchemaFieldRule(createQuestionFormSchema);
+
+const CreateQuestion: React.FC<CreateQuestionProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const form = useForm({
-    resolver: zodResolver(QuestionSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      options: [],
-      correctOption: "",
-      difficulty: "",
-      category: "",
-      isPractice: false,
-      isActive: false,
-    },
-  });
 
-  const mutation = useMutation(createQuestion, {
+  const [form] = useForm<z.infer<typeof createQuestionFormSchema>>();
+
+  useEffect(() => {
+    if (isOpen) {
+      form.resetFields();
+    }
+  }, [form, isOpen]);
+
+  const onOpen = () => {
+    setIsOpen(true);
+  };
+
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
+  const questionMutation = useMutation({
+    mutationKey: ["createQuestion"],
+    mutationFn: createQuestion,
     onSuccess: () => {
-      queryClient.invalidateQueries("questions");
-      toast({ title: "Question created successfully" });
+      queryClient.invalidateQueries({ queryKey: ["questions"] });
+      onClose();
+      toast.success("Question created successfully.");
     },
   });
 
-  const onSubmit = (data: any) => {
-    mutation.mutate(data);
+  const onSubmit = async (values: z.infer<typeof createQuestionFormSchema>) => {
+    questionMutation.mutate(values);
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Create Question</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create a new question</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter question title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Add more fields as necessary */}
-            <DialogFooter>
-              <Button type="submit">Submit</Button>
-            </DialogFooter>
-          </form>
+    <>
+      {children({ onOpen, onClose })}
+      <Drawer
+        title="Create Question"
+        open={isOpen}
+        onClose={onClose}
+        footer={
+          <div className="grid grid-cols-2 gap-3">
+            <Button key="back" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={questionMutation.isPending}
+              onClick={form.submit}
+            >
+              Save
+            </Button>
+          </div>
+        }
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmit}
+          initialValues={{
+            difficulty: questionDifficulty.EASY,
+            category: questionCategories.MATH,
+            options: [],
+          }}
+        >
+          {({ options }) => {
+            return (
+              <>
+                <Form.Item label="Title" name="title" rules={[rule]}>
+                  <Input placeholder="Enter question title" />
+                </Form.Item>
+                <Form.Item
+                  label="Description"
+                  name="description"
+                  rules={[rule]}
+                >
+                  <Input.TextArea placeholder="Enter question description" />
+                </Form.Item>
+                <Form.Item label="Options" name="options" rules={[rule]}>
+                  <Select mode="tags" placeholder="Enter options" />
+                </Form.Item>
+                <Form.Item
+                  label="Correct Option"
+                  name="correctOption"
+                  rules={[rule]}
+                >
+                  <Select placeholder="Select correct option">
+                    {options.map((option: string, index: number) => (
+                      <Select.Option key={index} value={option}>
+                        {option}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item label="Difficulty" name="difficulty" rules={[rule]}>
+                  <Select placeholder="Select difficulty">
+                    {Object.entries(questionDifficulty).map(([key, value]) => (
+                      <Select.Option key={key} value={value}>
+                        {value}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item label="Category" name="category" rules={[rule]}>
+                  <Select placeholder="Select category">
+                    {Object.entries(questionCategories).map(([key, value]) => (
+                      <Select.Option key={key} value={value}>
+                        {value}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  label="Is Practice?"
+                  name="isPractice"
+                  valuePropName="checked"
+                  layout="horizontal"
+                >
+                  <Checkbox />
+                </Form.Item>
+              </>
+            );
+          }}
         </Form>
-      </DialogContent>
-    </Dialog>
+      </Drawer>
+    </>
   );
 };
 
-export default CreateQuestionModal;
+export default CreateQuestion;

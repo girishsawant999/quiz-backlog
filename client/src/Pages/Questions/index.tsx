@@ -12,7 +12,7 @@ const Questions = () => {
         description={"Here's a list of questions in the system."}
         actionContainerRef={actionContainerRef}
       />
-      <main className="overflow-y-auto scrollbar-hidden">
+      <main className="overflow-y-auto scrollbar-hidden p-6">
         <QuestionsTable actionContainerRef={actionContainerRef} />
       </main>
     </section>
