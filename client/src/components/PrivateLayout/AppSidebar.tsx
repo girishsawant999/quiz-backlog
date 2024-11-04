@@ -1,5 +1,5 @@
 import { useAuth } from "@/Pages/Auth/context";
-import { Avatar, Divider, Dropdown, Menu } from "antd";
+import { Divider, Dropdown, Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { Home, LogOut, Logs, User, Users } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -57,11 +57,11 @@ export function AppSidebar() {
           }}
           trigger={["click"]}
         >
-          <div className="bg-blue-50 rounded-md ring-1 ring-blue-200 flex items-center gap-2 px-2 py-2">
-            <Avatar className="bg-blue-300 text-gray-900 ring-1 ring-blue-500 rounded-lg grid place-items-center size-6">
+          <div className="bg-blue-100 rounded-md ring-1 ring-blue-300 flex items-center gap-2 px-2 py-2 cursor-pointer">
+            <div className="bg-gradient-to-b from-blue-200 to-blue-400 text-gray-900 ring-1 ring-blue-500 rounded-lg grid place-items-center size-6">
               <User size={16} />
-            </Avatar>
-            <div className="truncate text-sm">
+            </div>
+            <div className="truncate text-sm capitalize">
               {user?.firstName} {user?.lastName}
             </div>
           </div>
