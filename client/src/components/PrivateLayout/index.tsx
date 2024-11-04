@@ -1,16 +1,17 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Layout } from "antd";
+import { Content } from "antd/es/layout/layout";
 import { AppSidebar } from "./AppSidebar";
 
 const PrivateLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <SidebarProvider>
+    <Layout>
       <AppSidebar />
-      <main className="relative w-full h-svh overflow-hidden grid py-6 px-8">
+      <Content className="relative w-full h-svh overflow-hidden grid">
         {children}
-      </main>
-    </SidebarProvider>
+      </Content>
+    </Layout>
   );
 };
 

@@ -1,25 +1,7 @@
-import { ChevronUp, Home, User2, Users } from "lucide-react";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
 import { useAuth } from "@/Pages/Auth/context";
-import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
+import { Avatar, Divider, Dropdown, Menu } from "antd";
+import Sider from "antd/es/layout/Sider";
+import { Home, LogOut, Logs, User, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Menu items.
@@ -37,7 +19,7 @@ const items = [
   {
     title: "Questions",
     url: "/questions",
-    icon: QuestionMarkCircledIcon,
+    icon: Logs,
   },
 ];
 
@@ -45,50 +27,46 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader />
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> {user?.firstName} {user?.lastName}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem onClick={logout}>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+    <Sider theme="light" className="relative">
+      <div className="logo">
+        <img
+          src="./assets/images/logo.png"
+          className="h-12 mx-auto mix-blend-multiply"
+        />
+      </div>
+      <Divider />
+      <Menu mode="inline" className="bg-transparent">
+        {items.map(({ url, icon: Icon, title }) => (
+          <Menu.Item key={url} icon={<Icon />}>
+            <Link to={url}>{title}</Link>
+          </Menu.Item>
+        ))}
+      </Menu>
+      <div className="absolute bottom-2 left-2 right-2">
+        <Divider />
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "sign-out",
+                label: "Sign out",
+                icon: <LogOut />,
+                onClick: logout,
+              },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <div className="bg-blue-50 rounded-md ring-1 ring-blue-200 flex items-center gap-2 px-2 py-2">
+            <Avatar className="bg-blue-300 text-gray-900 ring-1 ring-blue-500 rounded-lg grid place-items-center size-6">
+              <User size={16} />
+            </Avatar>
+            <div className="truncate text-sm">
+              {user?.firstName} {user?.lastName}
+            </div>
+          </div>
+        </Dropdown>
+      </div>
+    </Sider>
   );
 }
