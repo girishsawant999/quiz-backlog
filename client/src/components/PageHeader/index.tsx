@@ -22,10 +22,7 @@ const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
             {description}
           </div>
         </div>
-        <div
-          className="mt-5 flex lg:ml-4 lg:mt-0"
-          ref={actionContainerRef}
-        ></div>
+        <div className="mt-5 flex lg:ml-4 lg:mt-0" ref={actionContainerRef} />
       </Header>
     );
   }
