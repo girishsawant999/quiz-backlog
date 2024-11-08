@@ -28,12 +28,7 @@ export function AppSidebar() {
 
   return (
     <Sider theme="light" className="relative">
-      <div className="logo">
-        <img
-          src="./assets/images/logo.png"
-          className="h-12 mx-auto mix-blend-multiply"
-        />
-      </div>
+      <div className="logo h-[50px]"></div>
       <Divider />
       <Menu mode="inline" className="bg-transparent">
         {items.map(({ url, icon: Icon, title }) => (
