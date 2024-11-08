@@ -92,8 +92,8 @@ exports.deleteQuestion = async (req, res) => {
 
 exports.getQuestion = async (req, res) => {
   try {
-    const { _id: questionId } = req.body;
-    const question = await Question.findById(questionId);
+    const { _id: questionId } = req.query;
+    const question = await Question.findById(questionId).populate("category");
 
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
@@ -108,7 +108,9 @@ exports.getQuestion = async (req, res) => {
 
 exports.getQuestions = async (req, res) => {
   try {
-    const questions = await Question.find({ isDeleted: false });
+    const questions = await Question.find({ isDeleted: false }).populate(
+      "category"
+    );
     res.status(200).json({
       questions,
     });
