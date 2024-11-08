@@ -8,8 +8,12 @@ export const getQuestions = async () => {
   ).data.questions;
 };
 
-export const getQuestion = async (id: string) => {
-  return apiInstance.get(`question/getQuestion?id=${id}`);
+export const getQuestion = async (_id: string) => {
+  return (
+    await apiInstance.get<{ question: TQuestion }>(
+      `question/getQuestion?_id=${_id}`
+    )
+  ).data.question;
 };
 
 export const createQuestion = async (
@@ -18,12 +22,9 @@ export const createQuestion = async (
   return apiInstance.post("question/createQuestion", data);
 };
 
-export const updateQuestion = async (data: {
-  _id: string;
-  title: string;
-  content: string;
-  tags: string[];
-}) => {
+export const updateQuestion = async (
+  data: Partial<z.infer<typeof createQuestionSchema>>
+) => {
   return apiInstance.post("question/updateQuestion", data);
 };
 
