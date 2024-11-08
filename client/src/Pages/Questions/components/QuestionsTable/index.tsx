@@ -1,5 +1,4 @@
-// Import necessary components and hooks
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Dropdown,
@@ -8,26 +7,20 @@ import {
   Table,
   TableColumnsType,
 } from "antd";
-import { Ellipsis, PencilLine, Plus, Trash2 } from "lucide-react";
+import { Ellipsis, PencilLine, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { deleteQuestion, getQuestions } from "../../api";
-import CreateQuestionModal from "../CreateQuestionModal";
+import { useNavigate } from "react-router-dom";
+import { deleteQuestion } from "../../api";
+import { useQuestionsContext } from "../../context";
 
-const QuestionsTable = ({
-  actionContainerRef,
-}: {
-  actionContainerRef: React.RefObject<HTMLDivElement>;
-}) => {
+const QuestionsTable = () => {
   const queryClient = useQueryClient();
-
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-
-  const { data: questions, isFetching } = useQuery({
-    queryKey: ["questions"],
-    queryFn: getQuestions,
-    initialData: [],
-  });
+  const navigate = useNavigate();
+  const {
+    questionsQuery: { data: questions, isFetching },
+    actionContainerRef,
+  } = useQuestionsContext();
 
   const deleteQuestionMutation = useMutation({
     mutationKey: ["delete-question"],
@@ -67,7 +60,7 @@ const QuestionsTable = ({
                   icon: <PencilLine size={14} />,
                   label: "Edit question",
                   onClick: () => {
-                    setSelectedQuestion(record);
+                    navigate(`/questions/${record._id}/edit`);
                   },
                 },
                 {
@@ -86,7 +79,7 @@ const QuestionsTable = ({
         ),
       },
     ],
-    [deleteQuestionMutation]
+    [deleteQuestionMutation, navigate]
   );
 
   const [globalFilter, setGlobalFilter] = useState("");
@@ -102,25 +95,31 @@ const QuestionsTable = ({
               onChange={(event) => setGlobalFilter(event.target.value)}
               className="max-w-sm"
             />
-            <CreateQuestionModal>
-              {({ onOpen }) => (
-                <Button type="primary" onClick={onOpen}>
-                  <Plus />
-                  Create new question
-                </Button>
-              )}
-            </CreateQuestionModal>
+
+            <Dropdown.Button
+              type="primary"
+              onClick={() => {
+                navigate("/questions/new");
+              }}
+              menu={{
+                items: [
+                  {
+                    key: "create-practice",
+                    label: "Create practice question",
+                    onClick: () => {
+                      navigate("/questions/new?type=practice");
+                    },
+                  },
+                ],
+              }}
+            >
+              Create question
+            </Dropdown.Button>
           </div>,
           actionContainerRef.current
         )}
 
       <Table columns={columns} dataSource={questions} loading={isFetching} />
-      {/* <UpdateQuestionModal
-        open={!!selectedQuestion}
-        onOpenChange={(open) => setSelectedQuestion(open ? selectedQuestion : null)}
-        onClose={() => setSelectedQuestion(null)}
-        question={selectedQuestion}
-      /> */}
     </div>
   );
 };

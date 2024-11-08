@@ -24,3 +24,11 @@ export const QuestionSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
+
+export const QuestionCategorySchema = z.object({
+  category: z.string(),
+  description: z.string(),
+  _id: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
