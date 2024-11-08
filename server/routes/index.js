@@ -13,4 +13,8 @@ router.use("/auth", auth);
 const question = require("./question");
 router.use("/question", question);
 
+// Question Category Routes
+const questionCategory = require("./questionCategory");
+router.use("/questionCategory", questionCategory);
+
 module.exports = router;

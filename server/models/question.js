@@ -24,7 +24,11 @@ const questionSchema = new mongoose.Schema(
       ],
       default: userRoles.EASY,
     },
-    category: { type: String, enum: categories },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "QuestionCategory",
+      required: true,
+    },
     isVerified: { type: Boolean, default: false },
     verifiedBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -33,8 +37,6 @@ const questionSchema = new mongoose.Schema(
     },
     isPractice: { type: Boolean, default: false },
     isActive: { type: Boolean, default: false },
-    createdAtOn: { type: Date, require: true },
-    lastUsedOn: { type: Date, default: null },
     isDeleted: { type: Boolean, default: false },
   },
   {

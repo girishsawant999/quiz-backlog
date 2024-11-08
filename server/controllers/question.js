@@ -9,7 +9,7 @@ exports.createQuestion = async (req, res) => {
       correctOption,
       difficulty,
       category,
-      isPractice,
+      isPractice = false,
     } = req.body;
     const question = new Question({
       title,
@@ -19,7 +19,6 @@ exports.createQuestion = async (req, res) => {
       difficulty,
       category,
       isPractice,
-      createdAtOn: new Date(),
     });
     await question.save();
     return res
@@ -46,7 +45,6 @@ exports.updateQuestion = async (req, res) => {
       verifiedBy,
       isPractice,
       isActive,
-      lastUsedOn,
     } = req.body;
 
     const question = await Question.findById(questionId);
@@ -63,7 +61,6 @@ exports.updateQuestion = async (req, res) => {
     if (verifiedBy) question.verifiedBy = verifiedBy;
     if (isPractice) question.isPractice = isPractice;
     if (isActive) question.isActive = isActive;
-    if (lastUsedOn) question.lastUsedOn = lastUsedOn;
     await question.save();
     return res
       .status(200)
