@@ -1,18 +1,22 @@
+import toast from "@/components/Toaster";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Dropdown,
   Input,
-  message,
   Table,
   TableColumnsType,
+  Tag,
+  Tooltip,
 } from "antd";
 import { Ellipsis, PencilLine, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import colors from "tailwindcss/colors";
 import { deleteQuestion } from "../../api";
 import { useQuestionsContext } from "../../context";
+import { QUESTION_DIFFICULTIES } from "../../schema";
 
 const QuestionsTable = () => {
   const queryClient = useQueryClient();
@@ -26,7 +30,7 @@ const QuestionsTable = () => {
     mutationKey: ["delete-question"],
     mutationFn: deleteQuestion,
     onSuccess: () => {
-      message.success("Question has been deleted successfully");
+      toast.success("Question has been deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["questions"] });
     },
   });
@@ -36,18 +40,66 @@ const QuestionsTable = () => {
       {
         dataIndex: "title",
         title: "Title",
+        width: 400,
+        fixed: "left",
       },
       {
         dataIndex: "description",
         title: "Description",
+        render: (description) =>
+          description.length > 50 ? (
+            <Tooltip
+              title={description}
+              children={`${description.slice(0, 50)}...`}
+            />
+          ) : (
+            description
+          ),
       },
       {
-        dataIndex: "category",
-        title: "Category",
+        dataIndex: "options",
+        title: "Options",
+        render: (options: TQuestion["options"]) =>
+          options.map((option) => option.optionValue).join(", "),
+      },
+      {
+        dataIndex: "correctOption",
+        title: "Correct Option",
+        render: (correctOption, record) =>
+          record.options.find((option) => option.optionId === correctOption)
+            ?.optionValue,
       },
       {
         dataIndex: "difficulty",
         title: "Difficulty",
+        render: (difficulty) => (
+          <Tag
+            color={
+              difficulty === QUESTION_DIFFICULTIES.EASY
+                ? colors.emerald[500]
+                : difficulty === QUESTION_DIFFICULTIES.MEDIUM
+                ? colors.amber[500]
+                : colors.rose[500]
+            }
+          >
+            {difficulty}
+          </Tag>
+        ),
+      },
+      {
+        dataIndex: "category",
+        title: "Category",
+        render: (category) => category.category,
+      },
+      {
+        dataIndex: "isVerified",
+        title: "Verified",
+        render: (isVerified) =>
+          isVerified ? (
+            <Tag color={colors.emerald[500]}>Yes</Tag>
+          ) : (
+            <Tag color={colors.gray[500]}>No</Tag>
+          ),
       },
       {
         title: "Actions",
@@ -119,7 +171,12 @@ const QuestionsTable = () => {
           actionContainerRef.current
         )}
 
-      <Table columns={columns} dataSource={questions} loading={isFetching} />
+      <Table
+        columns={columns}
+        dataSource={questions}
+        loading={isFetching}
+        scroll={{ x: true }}
+      />
     </div>
   );
 };

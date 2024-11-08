@@ -1,9 +1,6 @@
 import toast from "@/components/Toaster";
-import { Button, Form, FormInstance, Input, Modal, Select } from "antd";
+import { Button, Form, FormInstance, Input, Modal } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
-import FormItem from "antd/es/form/FormItem";
-import clsx from "clsx";
-import { Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { createQuestionCategory } from "../../api";
@@ -24,12 +21,12 @@ const addQuestionCategorySchema = z.object({
 
 const rule = createSchemaFieldRule(addQuestionCategorySchema);
 
-const QuestionCategories = ({
+const QuestionCategoriesWrapper = ({
+  children,
   form,
-  className,
 }: {
+  children: (props: { showModal: () => void }) => React.ReactNode;
   form?: FormInstance;
-  className?: string;
 }) => {
   const [questionCategoryForm] =
     Form.useForm<z.infer<typeof addQuestionCategorySchema>>();
@@ -65,28 +62,9 @@ const QuestionCategories = ({
 
   return (
     <>
-      <FormItem
-        name="category"
-        label="Question Category"
-        className={clsx(className)}
-        rules={[{ required: true }]}
-      >
-        <div className="flex gap-2 items-center">
-          <Select
-            placeholder="Select a category"
-            loading={questionCategoriesQuery.isFetching}
-            className="flex-1"
-            onChange={(value) => form?.setFieldsValue({ category: value })}
-          >
-            {questionCategoriesQuery.data.map((category) => (
-              <Select.Option key={category._id} value={category._id}>
-                {category.category}
-              </Select.Option>
-            ))}
-          </Select>
-          <Button type="primary" onClick={showModal} icon={<Plus />} />
-        </div>
-      </FormItem>
+      {children({
+        showModal,
+      })}
 
       {isModalVisible && (
         <Modal
@@ -112,10 +90,10 @@ const QuestionCategories = ({
             layout="vertical"
             className="grid grid-cols-1"
           >
-            <FormItem name="category" label="Category" rules={[rule]}>
+            <Form.Item name="category" label="Category" rules={[rule]}>
               <Input placeholder="Enter category name" />
-            </FormItem>
-            <FormItem name="description" label="Description" rules={[rule]}>
+            </Form.Item>
+            <Form.Item name="description" label="Description" rules={[rule]}>
               <Input.TextArea
                 placeholder="Enter category description"
                 autoSize={{
@@ -123,7 +101,7 @@ const QuestionCategories = ({
                   minRows: 2,
                 }}
               />
-            </FormItem>
+            </Form.Item>
           </Form>
         </Modal>
       )}
@@ -131,4 +109,4 @@ const QuestionCategories = ({
   );
 };
 
-export default QuestionCategories;
+export default QuestionCategoriesWrapper;

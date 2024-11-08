@@ -6,6 +6,10 @@ export const QUESTIONS_ROUTES: {
   element: JSX.Element;
 }[] = [
   {
+    path: "/:questionId/:mode",
+    element: <QuestionForm />,
+  },
+  {
     path: "/new",
     element: <QuestionForm />,
   },
