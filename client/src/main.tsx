@@ -52,8 +52,25 @@ createRoot(document.getElementById("root")!).render(
       }}
       divider={{
         className: clsx(
-          "border-t-gray-300/80 border-t border-b border-b-gray-200/80 rounded-sm my-3"
+          "[&.ant-divider-horizontal]:border-t-gray-300/80 [&.ant-divider-horizontal]:border-t [&.ant-divider-horizontal]:border-b [&.ant-divider-horizontal]:border-b-gray-200/80 [&.ant-divider-horizontal]:rounded-sm [&.ant-divider-horizontal]:my-3",
+          "[&.ant-divider-vertical]:border-r-gray-300/80  [&.ant-divider-vertical]:border-r [&.ant-divider-vertical]:border-l-gray-200/80 [&.ant-divider-vertical]:border-l "
         ),
+      }}
+      form={{
+        colon: false,
+        scrollToFirstError: true,
+      }}
+      modal={{
+        classNames: {
+          content: clsx(
+            "[&.ant-modal-content]:bg-gray-100 [&.ant-modal-content]:p-1 [&_.ant-modal-close]:top-2"
+          ),
+          body: clsx("[&.ant-modal-body]:p-3 py-4 bg-white rounded-lg"),
+          header: clsx(
+            "[&.ant-modal-header]:bg-gray-100 [&.ant-modal-header]:px-4 [&.ant-modal-header]:pt-2 [&.ant-modal-header]:pb-1 text-center"
+          ),
+          footer: clsx("[&.ant-modal-footer]:px-4 [&.ant-modal-footer]:pb-2"),
+        },
       }}
     >
       <App />
