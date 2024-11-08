@@ -6,8 +6,9 @@
   * {
     font-family: "Inter", sans-serif;
   }
-
-  .scrollbar-hidden::-webkit-scrollbar {
-    display: none;
+  .scrollbar-hidden {
+    &::webkit-scrollbar {
+      display: none;
+    }
   }
 }

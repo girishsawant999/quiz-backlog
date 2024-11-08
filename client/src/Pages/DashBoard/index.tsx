@@ -5,7 +5,7 @@ const DashBoard = () => {
     <section className="grid grid-rows-[auto,1fr]">
       <PageHeader title="Dashboard" description={"Quiz backlog dashboard"} />
 
-      <main className="overflow-y-auto scrollbar-hidden p-6">DashBoard</main>
+      <main className="overflow-y-auto scrollbar-hidden px-6">DashBoard</main>
     </section>
   );
 };
