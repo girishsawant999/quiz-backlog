@@ -34,8 +34,8 @@ createRoot(document.getElementById("root")!).render(
       }}
       table={{
         className: clsx(
-          "[&_.ant-table-content_.ant-table-thead_.ant-table-cell]:px-4 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:py-2 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:bg-transparent [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:text-xs [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:text-gray-600 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:border-b-2",
-          "[&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:px-4 [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:py-2 [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:bg-transparent [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:text-sm [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:text-gray-600 ",
+          "[&_.ant-table-content_.ant-table-thead_.ant-table-cell]:px-4 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:py-2 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:bg-white [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:text-xs [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:text-gray-600 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:border-b-2 [&_.ant-table-content_.ant-table-thead_.ant-table-cell]:whitespace-nowrap",
+          "[&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:px-4 [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:py-2 [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:bg-white [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:text-sm [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:text-gray-600 [&_.ant-table-content_.ant-table-tbody_.ant-table-cell]:whitespace-nowrap",
           "[&_.ant-pagination.ant-table-pagination]:my-2"
         ),
       }}
