@@ -1,5 +1,6 @@
 import toast from "@/components/Toaster";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useDebounce from "@/hooks/use-debounce";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Dropdown,
@@ -14,24 +15,34 @@ import { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import colors from "tailwindcss/colors";
-import { deleteQuestion } from "../../api";
+import { deleteQuestion, getQuestions } from "../../api";
 import { useQuestionsContext } from "../../context";
 import { QUESTION_DIFFICULTIES } from "../../schema";
+import useQuestionTableReducer from "./reducer";
 
 const PER_PAGE = 10;
 
 const QuestionsTable = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { actionContainerRef } = useQuestionsContext();
+
+  const [state, dispatch] = useQuestionTableReducer();
+  const debouncedState = useDebounce(state, 500);
+
   const {
-    questionsQuery: {
-      data: { questions, totalQuestions },
-      isFetching,
+    data: { questions, totalQuestions },
+    isFetching,
+  } = useQuery({
+    queryKey: ["questions", debouncedState],
+    queryFn: () => getQuestions(debouncedState.page, debouncedState.search),
+    initialData: {
+      questions: [],
+      totalPages: 1,
+      totalQuestions: 0,
+      currentPage: 1,
     },
-    actionContainerRef,
-    state,
-    dispatch,
-  } = useQuestionsContext();
+  });
 
   const deleteQuestionMutation = useMutation({
     mutationKey: ["delete-question"],
