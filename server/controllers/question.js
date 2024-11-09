@@ -108,11 +108,27 @@ exports.getQuestion = async (req, res) => {
 
 exports.getQuestions = async (req, res) => {
   try {
-    const questions = await Question.find({ isDeleted: false }).populate(
-      "category"
-    );
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const query = {
+      isDeleted: false,
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ],
+    };
+
+    const questions = await Question.find(query)
+      .populate("category")
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const totalQuestions = await Question.countDocuments(query);
+
     res.status(200).json({
       questions,
+      totalQuestions,
+      totalPages: Math.ceil(totalQuestions / limit),
+      currentPage: parseInt(page),
     });
   } catch (error) {
     res.status(500).json({ message: error.message || "Internal Server Error" });
