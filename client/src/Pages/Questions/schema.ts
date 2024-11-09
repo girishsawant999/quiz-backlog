@@ -46,3 +46,10 @@ export const QuestionCategorySchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
+
+export const QuestionsResponseSchema = z.object({
+  questions: z.array(QuestionSchema),
+  totalQuestions: z.number(),
+  totalPages: z.number(),
+  currentPage: z.number(),
+});
