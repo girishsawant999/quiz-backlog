@@ -134,3 +134,24 @@ exports.getQuestions = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+
+exports.verifyQuestion = async (req, res) => {
+  try {
+    const { _id: questionId, verifiedBy } = req.body;
+
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+    question.isVerified = true;
+    question.verifiedBy = verifiedBy;
+    await question.save();
+    return res
+      .status(200)
+      .json({ message: "Question verified successfully", data: { question } });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: error?.message || "Internal Server Error" });
+  }
+};
