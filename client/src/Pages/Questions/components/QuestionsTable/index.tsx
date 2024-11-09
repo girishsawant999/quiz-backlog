@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "antd";
 import { Ellipsis, PencilLine, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import colors from "tailwindcss/colors";
@@ -18,12 +18,19 @@ import { deleteQuestion } from "../../api";
 import { useQuestionsContext } from "../../context";
 import { QUESTION_DIFFICULTIES } from "../../schema";
 
+const PER_PAGE = 10;
+
 const QuestionsTable = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const {
-    questionsQuery: { data: questions, isFetching },
+    questionsQuery: {
+      data: { questions, totalQuestions },
+      isFetching,
+    },
     actionContainerRef,
+    state,
+    dispatch,
   } = useQuestionsContext();
 
   const deleteQuestionMutation = useMutation({
@@ -134,8 +141,6 @@ const QuestionsTable = () => {
     [deleteQuestionMutation, navigate]
   );
 
-  const [globalFilter, setGlobalFilter] = useState("");
-
   return (
     <div className="w-full">
       {actionContainerRef.current &&
@@ -143,8 +148,10 @@ const QuestionsTable = () => {
           <div className="flex items-center gap-3">
             <Input
               placeholder="Search..."
-              value={globalFilter}
-              onChange={(event) => setGlobalFilter(event.target.value)}
+              value={state.search}
+              onChange={(event) =>
+                dispatch({ type: "SET_SEARCH", payload: event.target.value })
+              }
               className="max-w-sm"
             />
 
@@ -176,6 +183,12 @@ const QuestionsTable = () => {
         dataSource={questions}
         loading={isFetching}
         scroll={{ x: true }}
+        pagination={{
+          current: state.page,
+          onChange: (page) => dispatch({ type: "SET_PAGE", payload: page }),
+          total: totalQuestions,
+          pageSize: PER_PAGE,
+        }}
       />
     </div>
   );

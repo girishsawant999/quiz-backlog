@@ -2,10 +2,22 @@ import { apiInstance } from "@/helpers/api";
 import { z } from "zod";
 import { createQuestionSchema } from "../components/QuestionForm";
 
-export const getQuestions = async () => {
+const PER_PAGE = 10;
+
+export const getQuestions = async (page: number, search: string) => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    search,
+    limit: PER_PAGE.toString(),
+  });
   return (
-    await apiInstance.get<{ questions: TQuestion[] }>("question/getQuestions")
-  ).data.questions;
+    await apiInstance.get<{
+      questions: TQuestion[];
+      totalQuestions: number;
+      totalPages: number;
+      currentPage: number;
+    }>(`question/getQuestions?${params.toString()}`)
+  ).data;
 };
 
 export const getQuestion = async (_id: string) => {
