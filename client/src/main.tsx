@@ -60,6 +60,29 @@ createRoot(document.getElementById("root")!).render(
         colon: false,
         scrollToFirstError: true,
       }}
+      input={{
+        className: clsx(
+          "[&.ant-input-disabled]:text-gray-600 [&.ant-input-disabled]:bg-gray-200/30"
+        ),
+      }}
+      inputNumber={{
+        className: clsx(
+          "[&.ant-input-number-disabled]:text-gray-600 [&.ant-input-number-disabled]:bg-gray-200/30"
+        ),
+      }}
+      textArea={{
+        className: clsx(
+          "[&.ant-input-disabled]:text-gray-600 [&.ant-input-disabled]:bg-gray-200/30"
+        ),
+      }}
+      select={{
+        className: clsx(
+          "[&.ant-select-disabled_.ant-select-selection-item]:text-gray-600  [&.ant-select-disabled]:bg-gray-200/30 "
+        ),
+      }}
+      radio={{
+        className: clsx("[&.ant-radio-wrapper-disabled_span]:text-gray-600"),
+      }}
       modal={{
         classNames: {
           content: clsx(
