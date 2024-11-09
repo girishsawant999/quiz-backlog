@@ -2,7 +2,7 @@ import { Button, Card, Form, Input } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
 import { useForm } from "antd/es/form/Form";
 import { z } from "zod";
-import { useAuth } from "../context";
+import { useAuthContext } from "../context";
 
 const signInFormSchema = z.object({
   email: z.string().email({
@@ -16,7 +16,7 @@ const signInFormSchema = z.object({
 const rule = createSchemaFieldRule(signInFormSchema);
 
 const SignIn = () => {
-  const { login } = useAuth();
+  const { login } = useAuthContext();
   const [form] = useForm<z.infer<typeof signInFormSchema>>();
 
   const onSubmit = async (values: z.infer<typeof signInFormSchema>) => {

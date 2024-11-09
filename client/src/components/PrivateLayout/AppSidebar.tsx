@@ -1,4 +1,4 @@
-import { useAuth } from "@/Pages/Auth/context";
+import { useAuthContext } from "@/Pages/Auth/context";
 import { Divider, Dropdown, Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { Home, LogOut, Logs, User, Users } from "lucide-react";
@@ -24,7 +24,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthContext();
 
   return (
     <Sider theme="light" className="relative">
