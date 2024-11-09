@@ -14,7 +14,7 @@ export const UserSchema = z.object({
   otpCreatedAt: z.null(),
   isOtpVerified: z.null(),
   isAdmin: z.boolean(),
-  role: z.string(),
+  role: z.enum(["Admin", "Operator", "Approver"]),
   isActive: z.boolean(),
   lastLoggedAt: z.coerce.date(),
   isDeleted: z.boolean(),
