@@ -41,10 +41,14 @@ const useQuestionTableReducer = () => {
   });
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    params.set("page", state.page.toString());
-    params.set("search", state.search);
-    setSearchParams(params);
+    setSearchParams((params) => {
+      params.set("page", state.page.toString());
+
+      if (state.search) params.set("search", state.search);
+      else params.delete("search");
+
+      return params;
+    });
   }, [state, setSearchParams]);
 
   return [state, dispatch] as const;
