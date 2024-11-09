@@ -65,3 +65,7 @@ export const getQuestionCategories = async () => {
     }>("questionCategory/getQuestionCategories")
   ).data.data.questionCategories;
 };
+
+export const verifyQuestion = async (_id: string, verifiedBy: string) => {
+  return apiInstance.post("question/verifyQuestion", { _id, verifiedBy });
+};

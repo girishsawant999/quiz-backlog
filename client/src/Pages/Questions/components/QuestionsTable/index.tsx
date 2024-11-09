@@ -1,5 +1,6 @@
 import toast from "@/components/Toaster";
 import useDebounce from "@/hooks/use-debounce";
+import { useAuthContext } from "@/Pages/Auth/context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
@@ -10,8 +11,9 @@ import {
   Tag,
   Tooltip,
 } from "antd";
-import { Ellipsis, PencilLine, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { ItemType } from "antd/es/menu/interface";
+import { CheckCircle, Ellipsis, PencilLine, Trash2 } from "lucide-react";
+import { useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import colors from "tailwindcss/colors";
@@ -25,6 +27,8 @@ const PER_PAGE = 10;
 const QuestionsTable = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const { userInRole, userNotInRole } = useAuthContext();
   const { actionContainerRef } = useQuestionsContext();
 
   const [state, dispatch] = useQuestionTableReducer();
@@ -52,6 +56,67 @@ const QuestionsTable = () => {
       queryClient.invalidateQueries({ queryKey: ["questions"] });
     },
   });
+
+  const getActionItems = useCallback(
+    (record: TQuestion) => {
+      const actionItemsMap: Record<
+        "edit" | "verify" | "delete" | "divider",
+        ItemType
+      > = {
+        edit: {
+          key: "edit",
+          icon: <PencilLine size={14} />,
+          label: "Edit question",
+          onClick: () => {
+            navigate(`/questions/${record._id}/edit`);
+          },
+        },
+        verify: {
+          key: "verify",
+          icon: <CheckCircle size={14} />,
+          label: "Verify question",
+          onClick: () => {
+            navigate(`/questions/${record._id}/verify`);
+          },
+        },
+        delete: {
+          key: "delete",
+          icon: <Trash2 size={14} />,
+          label: "Delete question",
+          className: "!text-rose-600 hover:!bg-rose-100",
+          onClick: () => {
+            deleteQuestionMutation.mutate(record._id);
+          },
+        },
+        divider: {
+          key: "divider",
+          type: "divider",
+        },
+      };
+
+      const items: ItemType[] = [];
+
+      if (userInRole("Admin")) {
+        items.push(
+          actionItemsMap.edit,
+          actionItemsMap.verify,
+          actionItemsMap.divider,
+          actionItemsMap.delete
+        );
+      } else if (userInRole("Operator")) {
+        items.push(
+          actionItemsMap.edit,
+          actionItemsMap.divider,
+          actionItemsMap.delete
+        );
+      } else if (userInRole("Approver")) {
+        items.push(actionItemsMap.verify);
+      }
+
+      return items;
+    },
+    [userInRole, navigate, deleteQuestionMutation]
+  );
 
   const columns: TableColumnsType<TQuestion> = useMemo(
     () => [
@@ -124,24 +189,7 @@ const QuestionsTable = () => {
         render: (_, record) => (
           <Dropdown
             menu={{
-              items: [
-                {
-                  key: "edit",
-                  icon: <PencilLine size={14} />,
-                  label: "Edit question",
-                  onClick: () => {
-                    navigate(`/questions/${record._id}/edit`);
-                  },
-                },
-                {
-                  key: "delete",
-                  icon: <Trash2 size={14} />,
-                  label: "Delete question",
-                  onClick: () => {
-                    deleteQuestionMutation.mutate(record._id);
-                  },
-                },
-              ],
+              items: getActionItems(record),
             }}
           >
             <Button icon={<Ellipsis />} />
@@ -149,7 +197,7 @@ const QuestionsTable = () => {
         ),
       },
     ],
-    [deleteQuestionMutation, navigate]
+    [getActionItems]
   );
 
   return (
@@ -166,25 +214,27 @@ const QuestionsTable = () => {
               className="max-w-sm"
             />
 
-            <Dropdown.Button
-              type="primary"
-              onClick={() => {
-                navigate("/questions/new");
-              }}
-              menu={{
-                items: [
-                  {
-                    key: "create-practice",
-                    label: "Create practice question",
-                    onClick: () => {
-                      navigate("/questions/new?type=practice");
+            {userNotInRole("Approver") && (
+              <Dropdown.Button
+                type="primary"
+                onClick={() => {
+                  navigate("/questions/new");
+                }}
+                menu={{
+                  items: [
+                    {
+                      key: "create-practice",
+                      label: "Create practice question",
+                      onClick: () => {
+                        navigate("/questions/new?type=practice");
+                      },
                     },
-                  },
-                ],
-              }}
-            >
-              Create question
-            </Dropdown.Button>
+                  ],
+                }}
+              >
+                Create question
+              </Dropdown.Button>
+            )}
           </div>,
           actionContainerRef.current
         )}

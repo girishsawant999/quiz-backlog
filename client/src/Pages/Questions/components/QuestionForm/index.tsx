@@ -1,4 +1,5 @@
 import toast from "@/components/Toaster";
+import { useAuthContext } from "@/Pages/Auth/context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Checkbox, Divider, Form, Input, Radio, Select } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
@@ -6,7 +7,12 @@ import { ArrowLeft, Plus, X } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { z } from "zod";
-import { createQuestion, getQuestion, updateQuestion } from "../../api";
+import {
+  createQuestion,
+  getQuestion,
+  updateQuestion,
+  verifyQuestion,
+} from "../../api";
 import { useQuestionsContext } from "../../context";
 import { QUESTION_DIFFICULTIES } from "../../schema";
 import QuestionCategoriesWrapper from "../QuestionCategories";
@@ -39,10 +45,15 @@ const QuestionForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
+
+  const { user } = useAuthContext();
   const { questionCategoriesQuery } = useQuestionsContext();
 
   const params = useParams();
-  const { questionId, mode } = params;
+  const { questionId, mode } = params as {
+    questionId: string;
+    mode: "edit" | "verify";
+  };
 
   const isPractice = searchParams.get("type") === "practice";
   const [questionForm] = Form.useForm<z.infer<typeof createQuestionSchema>>();
@@ -68,6 +79,18 @@ const QuestionForm = () => {
         queryKey: ["questions"],
       });
       toast.success("Question updated successfully!");
+    },
+  });
+
+  const verifyQuestionMutation = useMutation({
+    mutationKey: ["verifyQuestion"],
+    mutationFn: (values: { _id: string; verifiedBy: string }) =>
+      verifyQuestion(values._id, values.verifiedBy),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["questions"],
+      });
+      toast.success("Question verified successfully!");
     },
   });
 
@@ -109,6 +132,11 @@ const QuestionForm = () => {
     questionForm.submit();
   };
 
+  const onVerifyQuestion = async () => {
+    if (!user) return;
+    verifyQuestionMutation.mutate({ _id: questionId, verifiedBy: user._id });
+  };
+
   useEffect(() => {
     if (isPractice) {
       questionForm.setFieldsValue({ isPractice: true });
@@ -127,7 +155,11 @@ const QuestionForm = () => {
         </button>
         <Divider type="vertical" />
         <button className="flex items-center gap-1 text-gray-800" disabled>
-          {mode === "edit" ? "Edit Question" : "Create Question"}
+          {mode === "edit"
+            ? "Edit Question"
+            : mode === "verify"
+            ? "Verify Question"
+            : "Create Question"}
         </button>
       </div>
 
@@ -136,6 +168,7 @@ const QuestionForm = () => {
           onFinish={onFinish}
           form={questionForm}
           layout="vertical"
+          disabled={mode === "verify"}
           className="grid grid-cols-12 gap-x-5 gap-y-1 max-w-screen-lg"
         >
           <Form.Item name="_id" hidden>
@@ -296,22 +329,34 @@ const QuestionForm = () => {
         </Form>
       </div>
       <div className="flex py-3 border-t border-gray-200 justify-end gap-3">
-        <Button
-          type="primary"
-          onClick={questionForm.submit}
-          loading={
-            questionCreateMutation.isPending || questionUpdateMutation.isPending
-          }
-        >
-          {mode === "edit" ? "Update" : "Create"}
-        </Button>
-        {mode !== "edit" && (
+        {mode !== "verify" && (
+          <Button
+            type="primary"
+            onClick={questionForm.submit}
+            loading={
+              questionCreateMutation.isPending ||
+              questionUpdateMutation.isPending
+            }
+          >
+            {mode === "edit" ? "Update" : "Create"}
+          </Button>
+        )}
+        {!mode && (
           <Button
             type="primary"
             loading={questionCreateMutation.isPending}
             onClick={onCreateAndNext}
           >
             Create & Next
+          </Button>
+        )}
+        {mode === "verify" && (
+          <Button
+            type="primary"
+            loading={verifyQuestionMutation.isPending}
+            onClick={onVerifyQuestion}
+          >
+            Verify
           </Button>
         )}
       </div>
