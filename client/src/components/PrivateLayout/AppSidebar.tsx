@@ -4,22 +4,26 @@ import { Divider, Dropdown, Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import clsx from "clsx";
 import { ChevronsRight, Home, LogOut, Logs, User, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import colors from "tailwindcss/colors";
 
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "/",
+    key: "dashboard",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
+    key: "users",
     title: "Users",
     url: "/users",
     icon: Users,
   },
   {
+    key: "questions",
     title: "Questions",
     url: "/questions",
     icon: Logs,
@@ -29,6 +33,14 @@ const items = [
 export function AppSidebar() {
   const { user, logout } = useAuthContext();
   const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
+  const location = useLocation();
+  const [selectedKey, setSelectedKey] = useState(
+    location.pathname.split("/")[1] || "/"
+  );
+
+  useEffect(() => {
+    setSelectedKey(location.pathname.split("/")[1] || "/");
+  }, [location]);
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -53,9 +65,13 @@ export function AppSidebar() {
 
       <div className="logo h-[50px] flex items-center justify-between px-2"></div>
       <Divider />
-      <Menu mode="inline" className="bg-transparent">
-        {items.map(({ url, icon: Icon, title }) => (
-          <Menu.Item key={url} icon={<Icon />}>
+      <Menu
+        mode="inline"
+        className="bg-transparent"
+        selectedKeys={[selectedKey]}
+      >
+        {items.map(({ key, url, icon: Icon, title }) => (
+          <Menu.Item key={key} icon={<Icon />}>
             <Link to={url}>{title}</Link>
           </Menu.Item>
         ))}

@@ -2,6 +2,7 @@ import SignIn from "@/Pages/Auth/SignIn";
 import DashBoard from "@/Pages/DashBoard";
 import Questions from "@/Pages/Questions";
 import Users from "@/Pages/Users";
+import { Navigate } from "react-router-dom";
 
 export const PUBLIC_ROUTES = [
   {
@@ -13,6 +14,10 @@ export const PUBLIC_ROUTES = [
 export const PRIVATE_ROUTES = [
   {
     path: "/",
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
+    path: "/dashboard",
     element: <DashBoard />,
   },
   {
