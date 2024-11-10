@@ -77,8 +77,13 @@ const UsersTable = ({
                     },
                   },
                   {
+                    key: "divider",
+                    type: "divider",
+                  },
+                  {
                     key: "delete",
                     icon: <Trash2 size={14} />,
+                    className: "!text-rose-600 hover:!bg-rose-100",
                     label: "Delete user",
                     onClick: () => {
                       deleteUserMutation.mutate(record._id);
