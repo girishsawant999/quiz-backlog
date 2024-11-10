@@ -44,7 +44,7 @@ export function AppSidebar() {
       <button
         onClick={toggleCollapse}
         className={clsx(
-          "bg-white p-1 z-10 transition-transform flex items-center justify-center rounded-full ring-1 ring-slate-200 absolute -right-2.5 top-1/2 -translate-y-1/2",
+          "bg-white p-1 z-10 transition-transform flex items-center justify-center rounded-full ring-1 ring-slate-200 absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2",
           !collapsed && "rotate-180"
         )}
       >

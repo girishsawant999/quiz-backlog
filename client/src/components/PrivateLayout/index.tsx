@@ -6,9 +6,9 @@ const PrivateLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <Layout>
+    <Layout className="bg-slate-100">
       <AppSidebar />
-      <Content className="relative w-full h-svh overflow-hidden grid">
+      <Content className="relative w-full overflow-hidden grid rounded-tl-2xl border-s border-slate-200 border-solid bg-white mt-1.5 h-[calc(100svh_-_6px)]">
         {children}
       </Content>
     </Layout>
