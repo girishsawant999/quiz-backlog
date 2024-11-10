@@ -108,7 +108,13 @@ exports.getQuestion = async (req, res) => {
 
 exports.getQuestions = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      difficulty,
+      isVerified,
+    } = req.body;
     const query = {
       isDeleted: false,
       $or: [
@@ -116,6 +122,9 @@ exports.getQuestions = async (req, res) => {
         { description: { $regex: search, $options: "i" } },
       ],
     };
+
+    if (difficulty) query.difficulty = difficulty;
+    if (isVerified !== undefined) query.isVerified = isVerified;
 
     const questions = await Question.find(query)
       .populate("category")
