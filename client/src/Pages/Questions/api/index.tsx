@@ -4,19 +4,25 @@ import { createQuestionSchema } from "../components/QuestionForm";
 
 const PER_PAGE = 10;
 
-export const getQuestions = async (page: number, search: string) => {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    search,
-    limit: PER_PAGE.toString(),
-  });
+export const getQuestions = async (state: {
+  page: number;
+  search: string;
+  difficulty: string | undefined;
+  isVerified: boolean | undefined;
+}) => {
   return (
-    await apiInstance.get<{
+    await apiInstance.post<{
       questions: TQuestion[];
       totalQuestions: number;
       totalPages: number;
       currentPage: number;
-    }>(`question/getQuestions?${params.toString()}`)
+    }>("question/getQuestions", {
+      page: state.page,
+      search: state.search,
+      limit: PER_PAGE,
+      difficulty: state.difficulty,
+      isVerified: state.isVerified,
+    })
   ).data;
 };
 

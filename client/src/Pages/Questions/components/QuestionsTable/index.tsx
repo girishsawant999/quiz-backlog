@@ -2,16 +2,9 @@ import toast from "@/components/Toaster";
 import useDebounce from "@/hooks/use-debounce";
 import { useAuthContext } from "@/Pages/Auth/context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Button,
-  Dropdown,
-  Input,
-  Table,
-  TableColumnsType,
-  Tag,
-  Tooltip,
-} from "antd";
+import { Button, Dropdown, Input, Table, Tag, Tooltip } from "antd";
 import { ItemType } from "antd/es/menu/interface";
+import { ColumnsType, TableProps } from "antd/es/table";
 import { CheckCircle, Ellipsis, PencilLine, Trash2 } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -39,7 +32,7 @@ const QuestionsTable = () => {
     isFetching,
   } = useQuery({
     queryKey: ["questions", debouncedState],
-    queryFn: () => getQuestions(debouncedState.page, debouncedState.search),
+    queryFn: () => getQuestions(debouncedState),
     initialData: {
       questions: [],
       totalPages: 1,
@@ -118,7 +111,7 @@ const QuestionsTable = () => {
     [userInRole, navigate, deleteQuestionMutation]
   );
 
-  const columns: TableColumnsType<TQuestion> = useMemo(
+  const columns: ColumnsType<TQuestion> = useMemo(
     () => [
       {
         dataIndex: "title",
@@ -168,6 +161,22 @@ const QuestionsTable = () => {
             {difficulty}
           </Tag>
         ),
+        filters: [
+          {
+            text: "Easy",
+            value: QUESTION_DIFFICULTIES.EASY,
+          },
+          {
+            text: "Medium",
+            value: QUESTION_DIFFICULTIES.MEDIUM,
+          },
+          {
+            text: "Hard",
+            value: QUESTION_DIFFICULTIES.HARD,
+          },
+        ],
+        filterMultiple: false,
+        filteredValue: state.difficulty ? [state.difficulty] : undefined,
       },
       {
         dataIndex: "category",
@@ -183,6 +192,18 @@ const QuestionsTable = () => {
           ) : (
             <Tag color={colors.gray[500]}>No</Tag>
           ),
+        filters: [
+          {
+            text: "Verified",
+            value: true,
+          },
+          {
+            text: "Not Verified",
+            value: false,
+          },
+        ],
+        filterMultiple: false,
+        filteredValue: state.isVerified !== undefined ? [state.isVerified] : [],
       },
       {
         title: "Actions",
@@ -197,8 +218,26 @@ const QuestionsTable = () => {
         ),
       },
     ],
-    [getActionItems]
+    [getActionItems, state.difficulty, state.isVerified]
   );
+
+  const onTableChange: TableProps<TQuestion>["onChange"] = (_, filters) => {
+    const { isVerified, difficulty } = filters;
+
+    if (isVerified?.[0] !== state.isVerified) {
+      dispatch({
+        type: "SET_VERIFIED",
+        payload: (isVerified?.[0] as boolean) ?? undefined,
+      });
+    }
+
+    if (difficulty?.[0] !== state.difficulty) {
+      dispatch({
+        type: "SET_DIFFICULTY",
+        payload: (difficulty?.[0] as string) ?? undefined,
+      });
+    }
+  };
 
   return (
     <div className="w-full">
@@ -213,7 +252,6 @@ const QuestionsTable = () => {
               }
               className="max-w-sm"
             />
-
             {userNotInRole("Approver") && (
               <Dropdown.Button
                 type="primary"
@@ -250,6 +288,7 @@ const QuestionsTable = () => {
           total: totalQuestions,
           pageSize: PER_PAGE,
         }}
+        onChange={onTableChange}
       />
     </div>
   );
