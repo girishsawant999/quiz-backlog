@@ -72,7 +72,7 @@ const QuestionsTable = () => {
           label: "Verify question",
           onClick: () => {
             navigate(`/questions/${record._id}/verify`, {
-              state: { question: record },
+              state: { question: record, questions },
             });
           },
         },

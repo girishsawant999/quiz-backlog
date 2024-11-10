@@ -65,7 +65,7 @@ const useQuestionTableReducer = () => {
       if (state.difficulty) params.set("difficulty", state.difficulty);
       else params.delete("difficulty");
 
-      if (state.isVerified)
+      if (state.isVerified !== undefined)
         params.set("isVerified", state.isVerified ? "1" : "0");
       else params.delete("isVerified");
 

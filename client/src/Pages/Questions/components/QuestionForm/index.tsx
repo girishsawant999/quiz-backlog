@@ -60,6 +60,8 @@ const QuestionForm = () => {
     mode: "edit" | "verify";
   };
 
+  const questions = (location.state.questions ?? []) as TQuestion[];
+
   const isPractice = searchParams.get("type") === "practice";
   const [questionForm] = Form.useForm<z.infer<typeof createQuestionSchema>>();
 
@@ -166,6 +168,30 @@ const QuestionForm = () => {
       }
     );
   };
+
+  const handleVerifyAndNext = () => {
+    if (!user) return;
+    verifyQuestionMutation.mutate(
+      { _id: questionId!, verifiedBy: user._id },
+      {
+        onSuccess: () => {
+          const currentIndex = questions.findIndex((q) => q._id === questionId);
+          const nextQuestion = questions[currentIndex + 1];
+          if (nextQuestion) {
+            navigate(`/questions/${nextQuestion._id}/verify`, {
+              state: { question: nextQuestion, questions },
+              replace: true,
+            });
+          } else {
+            toast.success("All questions have been verified!");
+            navigate(-1);
+          }
+        },
+      }
+    );
+  };
+
+  const allQuestionsVerified = questions.every((q) => q.isVerified);
 
   return (
     <section className="grid grid-rows-[auto,1fr,auto] gap-4 overflow-hidden h-full">
@@ -368,9 +394,18 @@ const QuestionForm = () => {
           </Button>
         )}
         {mode === "verify" && (
-          <Button type="primary" onClick={handleVerify}>
-            Verify
-          </Button>
+          <>
+            <Button type="primary" onClick={handleVerify}>
+              Verify
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleVerifyAndNext}
+              disabled={allQuestionsVerified}
+            >
+              Verify & Next
+            </Button>
+          </>
         )}
       </div>
     </section>
