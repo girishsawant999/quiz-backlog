@@ -5,7 +5,12 @@ import { Button, Checkbox, Divider, Form, Input, Radio, Select } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
 import { ArrowLeft, Plus, X } from "lucide-react";
 import { useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { z } from "zod";
 import {
   createQuestion,
@@ -44,6 +49,7 @@ const rule = createSchemaFieldRule(createQuestionSchema);
 const QuestionForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const { user } = useAuthContext();
   const { questionCategoriesQuery } = useQuestionsContext();
@@ -86,7 +92,11 @@ const QuestionForm = () => {
 
   const questionQuery = useQuery({
     queryKey: ["question", questionId],
-    queryFn: () => getQuestion(questionId!),
+    queryFn: () => {
+      if (location.state.question && location.state.question._id === questionId)
+        return location.state.question as TQuestion;
+      return getQuestion(questionId!);
+    },
     initialData: null,
     enabled: !!questionId,
   });

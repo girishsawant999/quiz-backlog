@@ -61,7 +61,9 @@ const QuestionsTable = () => {
           icon: <PencilLine size={14} />,
           label: "Edit question",
           onClick: () => {
-            navigate(`/questions/${record._id}/edit`);
+            navigate(`/questions/${record._id}/edit`, {
+              state: { question: record },
+            });
           },
         },
         verify: {
@@ -69,7 +71,9 @@ const QuestionsTable = () => {
           icon: <CheckCircle size={14} />,
           label: "Verify question",
           onClick: () => {
-            navigate(`/questions/${record._id}/verify`);
+            navigate(`/questions/${record._id}/verify`, {
+              state: { question: record },
+            });
           },
         },
         delete: {
