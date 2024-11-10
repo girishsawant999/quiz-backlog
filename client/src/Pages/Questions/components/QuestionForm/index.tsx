@@ -395,7 +395,11 @@ const QuestionForm = () => {
         )}
         {mode === "verify" && (
           <>
-            <Button type="primary" onClick={handleVerify}>
+            <Button
+              type="primary"
+              onClick={handleVerify}
+              disabled={questionQuery.data?.isVerified}
+            >
               Verify
             </Button>
             <Button
