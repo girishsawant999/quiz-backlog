@@ -43,11 +43,16 @@ const useQuestionTableReducer = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get("page");
   const search = searchParams.get("search");
+  const difficulty = searchParams.get("difficulty");
+  const isVerified = searchParams.get("isVerified");
 
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     page: page ? parseInt(page) : 1,
     search: search || "",
+    difficulty: difficulty || undefined,
+    isVerified:
+      isVerified === "1" ? true : isVerified === "0" ? false : undefined,
   });
 
   useEffect(() => {
@@ -56,6 +61,13 @@ const useQuestionTableReducer = () => {
 
       if (state.search) params.set("search", state.search);
       else params.delete("search");
+
+      if (state.difficulty) params.set("difficulty", state.difficulty);
+      else params.delete("difficulty");
+
+      if (state.isVerified)
+        params.set("isVerified", state.isVerified ? "1" : "0");
+      else params.delete("isVerified");
 
       return params;
     });
