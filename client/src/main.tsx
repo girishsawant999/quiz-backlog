@@ -5,6 +5,7 @@ import colors from "tailwindcss/colors";
 import App from "./App.tsx";
 
 import clsx from "clsx";
+import { Loader } from "lucide-react";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
       theme={{
         token: {
           colorPrimary: colors.indigo[600],
+          colorLink: colors.indigo[600],
         },
       }}
       menu={{
@@ -82,6 +84,9 @@ createRoot(document.getElementById("root")!).render(
       }}
       radio={{
         className: clsx("[&.ant-radio-wrapper-disabled_span]:text-gray-600"),
+      }}
+      spin={{
+        indicator: <Loader className="text-indigo-600 animate-spin" />,
       }}
       modal={{
         classNames: {
