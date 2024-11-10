@@ -19,7 +19,8 @@ createRoot(document.getElementById("root")!).render(
       }}
       menu={{
         className: clsx(
-          "[&.ant-menu-inline.ant-menu-inline]:border-e-0 [&_.ant-menu-item]:px-2 [&_.ant-menu-item]:h-8 [&_.ant-menu-item_svg]:size-4 [&_.ant-menu-item_.ant-menu-title-content]:text-sm",
+          "[&.ant-menu-vertical_.ant-menu-item]:flex [&.ant-menu-vertical_.ant-menu-item]:items-center [&.ant-menu-vertical.ant-menu-vertical]:border-e-0 [&.ant-menu-inline.ant-menu-inline]:border-e-0",
+          "[&_.ant-menu-item]:px-2 [&_.ant-menu-item]:h-8 [&_.ant-menu-item_svg]:size-4 [&_.ant-menu-item_.ant-menu-title-content]:text-sm",
           "[&_.ant-menu-item.ant-menu-item-selected]:bg-white [&_.ant-menu-item.ant-menu-item-selected]:ring-1 [&_.ant-menu-item.ant-menu-item-selected]:ring-gray-200"
         ),
       }}
