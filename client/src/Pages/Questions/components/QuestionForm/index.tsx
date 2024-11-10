@@ -1,6 +1,6 @@
 import toast from "@/components/Toaster";
 import { useAuthContext } from "@/Pages/Auth/context";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button, Checkbox, Divider, Form, Input, Radio, Select } from "antd";
 import { createSchemaFieldRule } from "antd-zod";
 import { ArrowLeft, Plus, X } from "lucide-react";
@@ -44,7 +44,6 @@ const rule = createSchemaFieldRule(createQuestionSchema);
 const QuestionForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const queryClient = useQueryClient();
 
   const { user } = useAuthContext();
   const { questionCategoriesQuery } = useQuestionsContext();
@@ -63,9 +62,6 @@ const QuestionForm = () => {
       createQuestion(values),
     mutationKey: ["createQuestion"],
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["questions"],
-      });
       toast.success("Question created successfully!");
     },
   });
@@ -75,9 +71,6 @@ const QuestionForm = () => {
       updateQuestion(values),
     mutationKey: ["updateQuestion"],
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["questions"],
-      });
       toast.success("Question updated successfully!");
     },
   });
@@ -87,9 +80,6 @@ const QuestionForm = () => {
     mutationFn: (values: { _id: string; verifiedBy: string }) =>
       verifyQuestion(values._id, values.verifiedBy),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["questions"],
-      });
       toast.success("Question verified successfully!");
     },
   });
@@ -119,29 +109,53 @@ const QuestionForm = () => {
     }
   }, [questionQuery.data, questionForm]);
 
-  const onFinish = async (values: z.infer<typeof createQuestionSchema>) => {
-    try {
-      if (mode === "edit") questionUpdateMutation.mutate(values);
-      else questionCreateMutation.mutate(values);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const onCreateAndNext = async () => {
-    questionForm.submit();
-  };
-
-  const onVerifyQuestion = async () => {
-    if (!user) return;
-    verifyQuestionMutation.mutate({ _id: questionId, verifiedBy: user._id });
-  };
-
   useEffect(() => {
     if (isPractice) {
       questionForm.setFieldsValue({ isPractice: true });
     }
   }, [isPractice, questionForm]);
+
+  const handleCreate = () => {
+    questionForm.validateFields().then((values) => {
+      questionCreateMutation.mutate(values, {
+        onSuccess: () => {
+          navigate(-1);
+        },
+      });
+    });
+  };
+
+  const handleCreateAndNext = () => {
+    questionForm.validateFields().then((values) => {
+      questionCreateMutation.mutate(values, {
+        onSuccess: () => {
+          questionForm.resetFields();
+        },
+      });
+    });
+  };
+
+  const handleUpdate = () => {
+    questionForm.validateFields().then((values) => {
+      questionUpdateMutation.mutate(values, {
+        onSuccess: () => {
+          navigate(-1);
+        },
+      });
+    });
+  };
+
+  const handleVerify = () => {
+    if (!user) return;
+    verifyQuestionMutation.mutate(
+      { _id: questionId!, verifiedBy: user._id },
+      {
+        onSuccess: () => {
+          navigate(-1);
+        },
+      }
+    );
+  };
 
   return (
     <section className="grid grid-rows-[auto,1fr,auto] gap-4 overflow-hidden h-full">
@@ -165,7 +179,6 @@ const QuestionForm = () => {
 
       <div className="overflow-y-auto scrollbar-hidden">
         <Form<z.infer<typeof createQuestionSchema>>
-          onFinish={onFinish}
           form={questionForm}
           layout="vertical"
           disabled={mode === "verify"}
@@ -180,7 +193,7 @@ const QuestionForm = () => {
             rules={[rule]}
             className="col-span-12"
           >
-            <Input placeholder="Enter question title" />
+            <Input placeholder="Enter question title" autoFocus />
           </Form.Item>
           <Form.Item
             name="description"
@@ -329,33 +342,23 @@ const QuestionForm = () => {
         </Form>
       </div>
       <div className="flex py-3 border-t border-gray-200 justify-end gap-3">
-        {mode !== "verify" && (
-          <Button
-            type="primary"
-            onClick={questionForm.submit}
-            loading={
-              questionCreateMutation.isPending ||
-              questionUpdateMutation.isPending
-            }
-          >
-            {mode === "edit" ? "Update" : "Create"}
-          </Button>
+        {mode === undefined && (
+          <>
+            <Button type="primary" onClick={handleCreate}>
+              Create
+            </Button>
+            <Button type="primary" onClick={handleCreateAndNext}>
+              Create & Next
+            </Button>
+          </>
         )}
-        {!mode && (
-          <Button
-            type="primary"
-            loading={questionCreateMutation.isPending}
-            onClick={onCreateAndNext}
-          >
-            Create & Next
+        {mode === "edit" && (
+          <Button type="primary" onClick={handleUpdate}>
+            Update
           </Button>
         )}
         {mode === "verify" && (
-          <Button
-            type="primary"
-            loading={verifyQuestionMutation.isPending}
-            onClick={onVerifyQuestion}
-          >
+          <Button type="primary" onClick={handleVerify}>
             Verify
           </Button>
         )}
