@@ -45,7 +45,7 @@ export function AppSidebar() {
         onClick={toggleCollapse}
         className={clsx(
           "bg-white p-1 z-10 transition-transform flex items-center justify-center rounded-full ring-1 ring-slate-200 absolute -right-2.5 top-1/2 -translate-y-1/2",
-          collapsed && "rotate-180"
+          !collapsed && "rotate-180"
         )}
       >
         <ChevronsRight size={18} color={colors.gray[800]} />
@@ -76,7 +76,7 @@ export function AppSidebar() {
           trigger={["click"]}
         >
           <div className="bg-blue-100 rounded-md ring-1 ring-blue-300 flex items-center gap-2 px-2 py-2 cursor-pointer">
-            <div className="bg-gradient-to-b from-blue-200 to-blue-400 text-gray-900 ring-1 ring-blue-500 rounded-lg grid place-items-center size-6">
+            <div className="bg-gradient-to-b from-blue-200 to-blue-400 text-gray-900 ring-1 ring-blue-500 rounded-lg grid place-items-center aspect-square min-w-6">
               <User size={16} />
             </div>
             {!collapsed && (
