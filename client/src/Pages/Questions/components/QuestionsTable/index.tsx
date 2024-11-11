@@ -107,12 +107,17 @@ const QuestionsTable = () => {
           actionItemsMap.delete
         );
       } else if (userInRole("Approver")) {
-        items.push(actionItemsMap.verify);
+        items.push(
+          actionItemsMap.edit,
+          actionItemsMap.verify,
+          actionItemsMap.divider,
+          actionItemsMap.delete
+        );
       }
 
       return items;
     },
-    [userInRole, navigate, deleteQuestionMutation]
+    [userInRole, navigate, questions, deleteQuestionMutation]
   );
 
   const columns: ColumnsType<TQuestion> = useMemo(

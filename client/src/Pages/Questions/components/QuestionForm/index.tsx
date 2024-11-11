@@ -60,7 +60,7 @@ const QuestionForm = () => {
     mode: "edit" | "verify";
   };
 
-  const questions = (location.state.questions ?? []) as TQuestion[];
+  const questions = (location.state?.questions ?? []) as TQuestion[];
 
   const isPractice = searchParams.get("type") === "practice";
   const [questionForm] = Form.useForm<z.infer<typeof createQuestionSchema>>();
@@ -217,7 +217,6 @@ const QuestionForm = () => {
         <Form<z.infer<typeof createQuestionSchema>>
           form={questionForm}
           layout="vertical"
-          disabled={mode === "verify"}
           className="grid grid-cols-12 gap-x-5 gap-y-1 max-w-screen-lg"
         >
           <Form.Item name="_id" hidden>
