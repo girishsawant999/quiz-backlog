@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { QUIZ_TYPE, QUESTION_DIFFICULTY } = require("../utils/enums");
 const Schema = mongoose.Schema;
 
 const quizSchema = new Schema(
@@ -67,10 +68,10 @@ const quizSchema = new Schema(
   }
 );
 
-quizSchema.virtual("quiz", {
+quizSchema.virtual("quizzes", {
   ref: "Quiz",
   localField: "_id",
   foreignField: "quizId",
 });
 
-export default mongoose.model("Quiz", quizSchema);
+module.exports = mongoose.model("Quiz", quizSchema);
