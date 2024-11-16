@@ -17,4 +17,8 @@ router.use("/question", question);
 const questionCategory = require("./questionCategory");
 router.use("/questionCategory", questionCategory);
 
+// Quiz Routes
+const quiz = require("./quiz");
+router.use("/quiz", quiz);
+
 module.exports = router;
