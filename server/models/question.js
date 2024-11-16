@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const { userRoles } = require("../utils/enums");
 
-const { questionDifficulty, questionCategory } = require("../utils/enums");
+const { QUESTION_DIFFICULTY } = require("../utils/enums");
 
-const categories = Object.values(questionCategory);
 const optionsSchema = new mongoose.Schema({
   optionId: { type: String, required: true },
   optionValue: { type: String, required: true },
@@ -18,11 +17,11 @@ const questionSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       enum: [
-        questionDifficulty.EASY,
-        questionDifficulty.MEDIUM,
-        questionDifficulty.HARD,
+        QUESTION_DIFFICULTY.EASY,
+        QUESTION_DIFFICULTY.MEDIUM,
+        QUESTION_DIFFICULTY.HARD,
       ],
-      default: userRoles.EASY,
+      default: QUESTION_DIFFICULTY.EASY,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { userRoles } = require("../utils/enums");
+const { USER_ROLES } = require("../utils/enums");
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,8 +27,8 @@ const userSchema = new mongoose.Schema(
     isAdmin: { type: Boolean, default: false },
     role: {
       type: String,
-      enum: [userRoles.ADMIN, userRoles.APPROVER, userRoles.OPERATOR],
-      default: userRoles.OPERATOR,
+      enum: [USER_ROLES.ADMIN, USER_ROLES.APPROVER, USER_ROLES.OPERATOR],
+      default: USER_ROLES.OPERATOR,
     },
     isActive: { type: Boolean, default: false },
     lastLoggedAt: { type: Date, default: null },
